@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="Cloudhub Application Metircs Smart Connector" prefix="module-cloudhub-application-metircs"
+    doc:description="This module relies in runtime provided components" xmlns="http://www.mulesoft.org/schema/mule/module"
+    xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:tns="http://www.mulesoft.org/schema/mule/module-cloudhub-application-metircs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/module-cloudhub-application-metircs http://www.mulesoft.org/schema/mule/module-cloudhub-application-metircs/current/mule-module-cloudhub-application-metircs.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <property name="username" type="string"></property>
+    <property name="password" type="string"></property>
+    <property name="environmentid" type="string"></property>
+    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration"
+        doc:id="4e0ddea5-f8da-482b-9418-7a81dba5dd03" basePath="/cloudhub/api/v2">
+        <http:request-connection protocol="HTTPS" host="anypoint.mulesoft.com">
+            <http:authentication>
+                <http:basic-authentication username="#[vars.username]" password="#[vars.password]"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+    <operation name="application-metrics">
+        <parameters>
+            <parameter name="domain" type="string"/>
+        </parameters>
+        <body>
+            <http:request method="GET" doc:name="Request" doc:id="718c347b-d7a2-430a-b3fd-777f26de46e4"
+                config-ref="HTTP_Request_configuration" path="/applications/{domain}">
+                <http:headers><![CDATA[#[output application/java
+---
+{
+	"X-ANYPNT-ENV-ID" : vars.environmentid
+}]]]></http:headers>
+<http:uri-params ><![CDATA[#[output application/java
+---
+{
+    "domain" : vars.domain
+}]]]></http:uri-params>
+            </http:request>
+        </body>
+        <output type="any"/>
+    </operation>
+</module>
